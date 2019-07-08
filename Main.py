@@ -1,5 +1,4 @@
 from CFItemItem import CFItemItem
-from CFItemItemWithContent import CFItemItemWithContent
 from CFUserUser import CFUserUser
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -10,7 +9,8 @@ from scipy import sparse
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-from CFUserUser_with_content import CFUserUser_with_content
+from PopularityBased import PopularityBased
+from SVD import SVD
 
 
 def get_data():
@@ -49,6 +49,7 @@ def get_precision_and_recall_by_time_split(user_index, k, algorithm):
     projects_list = list(user_data['project'].values)
     projects_list = [str(int(x)) for x in projects_list if x is not None and x==x]
     projects_list = list(unique_everseen(projects_list))
+    projects_list = [int(x) for x in projects_list]
     if len(projects_list)>2:
         splitter_index = max(1, int(0.9*len(projects_list)))
         # split to train and test by timeline!!
@@ -112,11 +113,10 @@ data_matrix = calculate_similarity_by_content()
 
 def main():
     #example
-    cf = CFItemItem(data_items_train)
-    known_user_likes = data_items.loc[32]
-    known_user_likes = known_user_likes[known_user_likes > 0].index.values
-    print (known_user_likes)
+    cf = SVD(data_items_train)
     print(get_precision_and_recall_by_time_split(32, 3, cf))
+
+
 
 def get_result(user_index, k):
     cf = CFUserUser(data_items_train)
