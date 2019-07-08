@@ -24,6 +24,7 @@ class CFUserUser(Strategy):
         return known_user_likes
 
     def get_recommendations(self, user_index, known_user_likes_train, k):
+        known_user_likes_train = [int(x) for x in known_user_likes_train]
         similarUsers = self.findksimilarusers(user_index).drop(user_index, 0)
         similar_projects = [self.get_user_projects(user) for user in similarUsers.index]
         similar_projects = list(set([item for sublist in similar_projects for item in sublist]))

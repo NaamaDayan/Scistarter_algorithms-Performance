@@ -17,6 +17,7 @@ class CFItemItem(Strategy):
         return sim
 
     def get_recommendations(self, user_index, known_user_likes_train, k):
+        known_user_likes_train = [int(x) for x in known_user_likes_train]
         user_projects = self.data_matrix[known_user_likes_train]  # without ratings!!
         neighbourhood_size = 10
         data_neighbours = pd.DataFrame(0, user_projects.columns, range(1, neighbourhood_size + 1))

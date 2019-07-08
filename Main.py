@@ -65,6 +65,7 @@ def get_precision_and_recall_by_time_split(user_index, k, algorithm):
 
 
 def calc_special_precision(relevant_projects, known_user_likes_test):
+    known_user_likes_test = [int(x) for x in known_user_likes_test]
     precision = np.intersect1d(relevant_projects, known_user_likes_test).size / len(relevant_projects)
     rejected_recs = list(set(relevant_projects) - set(known_user_likes_test))
     similarity_sums = np.sum([calc_max_sim(rp, known_user_likes_test) for rp in rejected_recs])
@@ -72,7 +73,7 @@ def calc_special_precision(relevant_projects, known_user_likes_test):
 
 
 def calc_max_sim(rejected_project, chosen_projects):
-    return np.max([data_matrix.loc[cp][rejected_project] for cp in chosen_projects])
+    return np.max([data_matrix.loc[str(cp)][str(rejected_project)] for cp in chosen_projects])
 
 
 def precision_recall_at_k(k_values, test_users, algorithm):
@@ -99,9 +100,11 @@ def calculate_similarity_by_content():
 
 data = pd.read_pickle('data.pkl')
 data_items = data.drop('user', 1)
-records = pd.read_pickle('records.pkl')
+# records = pd.read_pickle('records.pkl')#rec.pkl
+records = pd.read_pickle('rec.pkl')
 data_items_train = pd.read_pickle('data_items_train.pkl')
-projects_data = pd.read_csv('projects_meta_data_4_attr.csv', index_col=0)
+# projects_data = pd.read_csv('projects_meta_data_4_attr.csv', index_col=0) #dev.csv
+projects_data = pd.read_csv('dev.csv', index_col=0)
 projects_data = projects_data.fillna('')
 data_matrix = calculate_similarity_by_content()
 #data_matrix = calculate_similarity(data_items_train)
@@ -109,9 +112,15 @@ data_matrix = calculate_similarity_by_content()
 
 def main():
     #example
-    cf = CFUserUser(data_items_train)
-    print(get_precision_and_recall_by_time_split(68684, 3, cf))
+    cf = CFItemItem(data_items_train)
+    known_user_likes = data_items.loc[32]
+    known_user_likes = known_user_likes[known_user_likes > 0].index.values
+    print (known_user_likes)
+    print(get_precision_and_recall_by_time_split(32, 3, cf))
 
+def get_result(user_index, k):
+    cf = CFUserUser(data_items_train)
+    return get_precision_and_recall_by_time_split(user_index, k, cf)
 
 if __name__ == "__main__":
     main()
