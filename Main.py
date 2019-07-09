@@ -57,6 +57,8 @@ def get_precision_and_recall_by_time_split(user_index, k, algorithm):
         known_user_likes_test = projects_list[splitter_index:]
         relevant_projects = algorithm.get_recommendations(user_index, known_user_likes_train, k)
         print (relevant_projects)
+        if len(relevant_projects)<k: #for debugging
+            print ("problem with user: ", user_index)
         # calculate recall and precision - this is the same value since the sets are the same size
         precision = np.intersect1d(relevant_projects, known_user_likes_test).size / len(relevant_projects)
         special_percision = calc_special_precision(relevant_projects, known_user_likes_test)
@@ -82,10 +84,11 @@ def precision_recall_at_k(k_values, test_users, algorithm):
         results = []
         for user in test_users:
             results.append(get_precision_and_recall_by_time_split(user, k, algorithm))
-        precisions = np.mean([i[0] for i in results if i>=0])
-        recalls = np.mean([i[1] for i in results if i>=0])
-        special_precisions = np.mean([i[2] for i in results if i>=0])
+        precisions = np.mean([i[0] for i in results if i[0]>=0])
+        recalls = np.mean([i[1] for i in results if i[1]>=0])
+        special_precisions = np.mean([i[2] for i in results if i[2]>=0])
         print (precisions, recalls, special_precisions)
+
 
 def calculate_similarity_by_content():
     tf_idf = TfidfVectorizer()
@@ -113,10 +116,7 @@ data_matrix = calculate_similarity_by_content()
 
 def main():
     #example
-    cf = SVD(data_items_train)
-    print(get_precision_and_recall_by_time_split(32, 3, cf))
-
-
+    cf = CFUserUser(data_items_train)
 
 def get_result(user_index, k):
     cf = CFUserUser(data_items_train)
